@@ -43,8 +43,9 @@ public class ParallelFactorialCalculator extends FactorialCalculator {
             task1.fork();
 
             FactorialTask task2 = new FactorialTask(mid + 1, last);
+            task2.fork();
 
-            return task2.compute().multiply(task1.join());
+            return task2.join().multiply(task1.join());
         }
     }
 }
