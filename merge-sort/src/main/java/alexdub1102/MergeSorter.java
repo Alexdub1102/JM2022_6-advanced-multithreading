@@ -9,18 +9,18 @@ public class MergeSorter {
 
     public MergeSorter(int[] arr) {
         this.arr = arr;
-        copy = new int[arr.length];
+        this.copy = new int[arr.length];
     }
 
     public void sort() {
-        ForkJoinPool pool = ForkJoinPool.commonPool();
-        pool.invoke(new SortTask(0, arr.length - 1));
-        pool.shutdown();
+        var forkJoinPool = ForkJoinPool.commonPool();
+        forkJoinPool.invoke(new SortTask(0, arr.length - 1));
+        forkJoinPool.shutdown();
     }
 
     private class SortTask extends RecursiveAction {
-        int lo;
-        int hi;
+        private final int lo;
+        private final int hi;
 
         public SortTask(int lo, int hi) {
             this.lo = lo;
@@ -35,8 +35,11 @@ public class MergeSorter {
             task1.fork();
 
             var task2 = new SortTask(mid+1, hi);
-            task2.compute();
+            task2.fork();
+
             task1.join();
+            task2.join();
+
             merge(lo, mid, hi);
         }
 
@@ -57,7 +60,6 @@ public class MergeSorter {
                     arr[k] = copy[i++];
                 }
             }
-
         }
     }
 }
